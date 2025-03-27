@@ -24,9 +24,29 @@ async function initializeDatabase() {
     }
 }
 
+async function initializeDatabaseWisata() {
+    try {
+        const db = await mysql.createConnection(dbConfig);
+        await db.execute(`
+            CREATE TABLE IF NOT EXISTS wisata (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nama VARCHAR(255) NOT NULL,
+                lokasi VARCHAR(255) NOT NULL,
+                gambar VARCHAR(255) NOT NULL,
+                deskripsi TEXT NOT NULL,
+                rating FLOAT NOT NULL
+            )
+        `);
+        db.end();
+        console.log("Database initialized Wisata");
+    } catch (error) {
+        console.error("Error initializing database:", error);
+    }
+}
+
 async function getDBConnection() {
     return await mysql.createConnection(dbConfig);
 }
 
 
-module.exports = { initializeDatabase, getDBConnection };
+module.exports = { initializeDatabase, initializeDatabaseWisata, getDBConnection };

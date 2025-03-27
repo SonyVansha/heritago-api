@@ -54,6 +54,7 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   const token = req.headers['authorization'];
+  // Add the token to the blacklist
   if (token) {
       blacklistToken(token);
   }
