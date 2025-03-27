@@ -1,19 +1,26 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require('body-parser');
+const path = require("path");
 
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
+const certificateRoutes = require("./routes/certificateRoutes");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
+// Serve static files from the "public" directory
+app.use("/certificates", express.static(path.join(__dirname, "public", "certificates")));
+app.use(cors({ origin: '*', credentials: true }));
+
 // Define routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", tourRoutes);
+app.use("/api", certificateRoutes);
 
 module.exports = app;
