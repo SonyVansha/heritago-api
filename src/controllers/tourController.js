@@ -1,4 +1,4 @@
-const modelTour = require("../models/tourModels"); // Assuming Sequelize models are defined and exported from models/index.js
+const modelTour = require("../models/tourModels");
 
 // Membuat tours
 const getTour = async (req, res) => {

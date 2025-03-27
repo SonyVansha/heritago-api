@@ -2,8 +2,7 @@ const { getDBConnection } = require("../config/db");
 const bcrypt = require('bcrypt');
 const { blacklistToken } = require("../middlewares/authMiddleware");
 const jwt = require('jsonwebtoken');
-const secretKey = 'your-secret-key'; // Replace with your actual secret key
-
+const secretKey = 'your-secret-key';
 
 // Register user
 
