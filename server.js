@@ -7,6 +7,6 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {
     await initializeDatabase();
-    await initializeDatabaseWisata();
+    // await initializeDatabaseWisata();
     console.log(`Server running on port ${PORT}`);
 });
