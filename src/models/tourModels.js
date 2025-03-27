@@ -4,6 +4,9 @@ const modelTour = {
   getAll: async () => {
     return await Wisata.findAll();
   },
+  getById: async (id) => {
+    return await Wisata.findByPk(id);
+  },
   // Menambahkan wisata baru
   create: async (data) => {
     // console.log('Data yang diterima:', data); // Debugging untuk cek input

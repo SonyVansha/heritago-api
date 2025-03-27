@@ -10,6 +10,19 @@ const getTour = async (req, res) => {
   }
 };
 
+const getTourbyId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tour = await modelTour.getById(Number(id)); // Sequelize method to fetch a record by ID
+    if (!tour) {
+      return res.status(404).json({ error: "Data tidak ditemukan" });
+    }
+    res.json(tour);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Menambahkan tour baru
 const addTour = async (req, res) => {
   try {
@@ -51,4 +64,4 @@ const deleteTour = async (req, res) => {
 };
 
 
-module.exports = { getTour, addTour, deleteTour };
+module.exports = { getTour, getTourbyId, addTour, deleteTour };
