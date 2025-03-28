@@ -3,7 +3,8 @@ const modelTour = require("../models/tourModels");
 // Membuat tours
 const getTour = async (req, res) => {
   try {
-    const tours = await modelTour.getAll(); // Sequelize method to fetch all records
+    // Sequelize method to fetch all records
+    const tours = await modelTour.getAll(); 
     res.json(tours);
   } catch (err) {
     res.status(500).json({ error: err.message });

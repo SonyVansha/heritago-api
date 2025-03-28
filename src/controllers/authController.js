@@ -58,39 +58,13 @@ const loginUser = async (req, res) => {
         console.error("Login Error:", error);
         res.status(500).json({ message: 'Terjadi kesalahan pada server' });
     }
-    // const { username, password } = req.body;
-
-    // if (!username || !password) {
-    //     return res.status(400).json({ message: 'Username dan password wajib diisi' });
-    // }
-
-    // try {
-    //     const user = await User.findOne({ where: { username } });
-    //     console.log('User ditemukan:', user);
-    //     if (!user) {
-    //         return res.status(401).json({ message: 'Username atau password salah' });
-    //     }
-
-    //     const passwordMatch = await bcrypt.compare(password, user.password);
-
-    //     if (!passwordMatch) {
-    //         return res.status(401).json({ message: 'Username atau password salah' });
-    //     }
-
-    //     const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-
-    //     activeTokens.add(token);
-    //     res.cookie('token', token, { httpOnly: true, secure: true });
-    //     res.json({ message: 'Login berhasil', token });
-    // } catch (error) {
-    //     res.status(500).json({ message: 'Terjadi kesalahan pada server' });
-    // }
 };
 
 const logoutUser = async (req, res) => {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
-    removeActiveToken(token); // Hapus token dari daftar aktif
+    // Hapus token dari daftar aktif
+    removeActiveToken(token); 
     res.clearCookie('token');
     res.json({ message: 'Logout berhasil' });
 };
