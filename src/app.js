@@ -3,11 +3,13 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const path = require("path");
 
-
+// Import routes
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
+
+// Middleware to parse cookies
 const cookieParser = require("cookie-parser");
 const app = express();
 
@@ -25,5 +27,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", tourRoutes);
 app.use("/api", certificateRoutes);
+
+// app routes for testing server side
+app.use("/", (req, res) => {
+  res.send('Hello World!')
+});
 
 module.exports = app;
