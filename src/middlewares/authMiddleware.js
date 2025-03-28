@@ -1,17 +1,33 @@
 const jwt = require('jsonwebtoken');
 
-function authenticateToken(req, res, next) {
-  const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+const activeTokens = new Set();
 
-  if (!token) {
-    return res.status(401).json({ message: 'Anda belum login' });
-  }
+const authenticateToken = (req, res, next) => {
+    let token = req.headers.authorization?.split(' ')[1] || req.cookies.token;
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Token tidak valid' });
-    req.user = user;
-    next();
-  });
-}
+    if (!token) {
+        return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
 
-module.exports = { authenticateToken };
+    if (!activeTokens.has(token)) {
+        return res.status(401).json({ message: 'Token tidak valid atau sudah logout' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Token tidak sah' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+const addActiveToken = (token) => {
+    activeTokens.add(token);
+};
+
+const removeActiveToken = (token) => {
+    activeTokens.delete(token);
+};
+
+module.exports = { authenticateToken, addActiveToken, removeActiveToken };

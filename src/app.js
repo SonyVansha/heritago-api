@@ -3,15 +3,18 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const path = require("path");
 
+
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Serve static files from the "public" directory
 app.use("/certificates", express.static(path.join(__dirname, "public", "certificates")));
