@@ -1,0 +1,78 @@
+### API
+
+## Auth
+
+# Verifikasi User (X)
+POST http://localhost:5000/api/auth/verify
+
+# Login user
+http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "sony1",
+  "password": "adminsony"
+}
+
+# Create users admin or user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "sony1",
+  "password": "adminsony",
+  "role": "user"
+}
+
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "sony",
+  "password": "adminsony",
+  "role": "admin"
+}
+
+# Get All User
+GET http://localhost:5000/api/users
+
+# Delete user
+DELETE http://localhost:5000/api/auth/user/1
+
+
+
+## Tour Wisata
+
+# Create data tour wisata
+POST http://localhost:5000/api/addtour
+Content-Type: application/json
+
+{
+  "nama": "Jam",
+  "lokasi": "Bukittinggi, Padang",
+  "gambar": "jam_gadang.jpg",
+  "deskripsi": "Ikon kota Bukittinggi yang terkenal dengan jam besarnya.",
+  "rating": 8.7
+}
+
+# Get data Tour All
+GET http://localhost:5000/api/tour
+
+# Get data Tour by Id
+GET http://localhost:5000/api/tour/1
+
+# Delete Data Tour
+DELETE http://localhost:5000/api/tour/1
+
+
+## Generate Certificate
+
+# Generate
+POST http://localhost:5000/api/generate-certificate
+Content-Type: application/json
+
+{
+    "name": "Sony Vansha",
+    "course": "Node.js Mastery",
+    "date": "2024-03-27"
+}

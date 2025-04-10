@@ -6,7 +6,7 @@ const { initializeDatabase, initializeDatabaseWisata } = require("./src/config/d
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {
-    await initializeDatabase();
+    // await initializeDatabase();
     // await initializeDatabaseWisata();
     console.log(`Server running on port ${PORT}`);
 });

@@ -22,6 +22,32 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+  
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Token tidak tersedia' });
+    }
+  
+    const token = authHeader.split(' ')[1];
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+      next();
+    } catch (err) {
+      return res.status(403).json({ message: 'Token tidak valid atau sudah expired' });
+    }
+  };
+
+const isAdmin = (req, res, next) => {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin only' });
+    }
+    next();
+};
+  
+
 const addActiveToken = (token) => {
     activeTokens.add(token);
 };
@@ -30,4 +56,4 @@ const removeActiveToken = (token) => {
     activeTokens.delete(token);
 };
 
-module.exports = { authenticateToken, addActiveToken, removeActiveToken };
+module.exports = { authenticateToken, addActiveToken, removeActiveToken, isAdmin, verifyToken };

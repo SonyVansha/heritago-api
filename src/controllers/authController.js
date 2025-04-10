@@ -7,8 +7,9 @@ const { addActiveToken, removeActiveToken } = require('../middlewares/authMiddle
 // Simpan token aktif
 // let activeTokens = new Set();
 
+// Register User
 const registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ message: 'Username dan password wajib diisi' });
@@ -16,7 +17,10 @@ const registerUser = async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ username, password: hashedPassword });
+        if (role !== 'user' && role !== 'admin') {
+            return res.status(400).json({ message: 'Role hanya boleh user atau admin' });
+        }
+        await User.create({ username, password: hashedPassword, role });
 
         res.json({ message: 'Registrasi berhasil' });
     } catch (error) {
@@ -28,6 +32,7 @@ const registerUser = async (req, res) => {
     }
 };
 
+// login User
 const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -52,14 +57,15 @@ const loginUser = async (req, res) => {
         const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn });
 
         addActiveToken(token); // Simpan token ke daftar aktif
-        res.cookie('token', token, { httpOnly: true, secure: true });
-        res.json({ message: 'Login berhasil', token });
+        // res.cookie('token', token, { httpOnly: true, secure: true });
+        res.json({ message: 'Login berhasil', token, role: user.role });
     } catch (error) {
         console.error("Login Error:", error);
         res.status(500).json({ message: 'Terjadi kesalahan pada server' });
     }
 };
 
+// Logout User
 const logoutUser = async (req, res) => {
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
@@ -69,10 +75,33 @@ const logoutUser = async (req, res) => {
     res.json({ message: 'Logout berhasil' });
 };
 
+// Verifikasi User
+// const verifyUser = async (req, res) => {
+//     res.json({ message: 'Anda masih login', user: { username: req.user.username, role: req.user.role } });
+// };
 const verifyUser = async (req, res) => {
-    res.json({ message: 'Anda masih login', user: req.user });
-};
+    try {
+      const user = await User.findByPk(req.user.id);
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User tidak ditemukan' });
+      }
+  
+      res.json({
+        message: 'Token valid, user terverifikasi',
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error('Verifikasi error:', error);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    }
+  };
 
+// Get All Users
 const getAllUsers = async (req, res) => {
   try {
     const users = await modelUser.getAll();
@@ -82,6 +111,7 @@ const getAllUsers = async (req, res) => {
 }
 };
 
+// Delete User
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
