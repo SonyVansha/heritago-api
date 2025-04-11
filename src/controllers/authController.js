@@ -33,47 +33,115 @@ const registerUser = async (req, res) => {
 };
 
 // login User
+// const loginUser = async (req, res) => {
+//     const { username, password } = req.body;
+
+//     if (!username || !password) {
+//         return res.status(400).json({ message: 'Username dan password wajib diisi' });
+//     }
+
+//     try {
+//         const user = await User.findOne({ where: { username } });
+
+//         if (!user) {
+//             return res.status(401).json({ message: 'Username atau password salah' });
+//         }
+
+//         const passwordMatch = await bcrypt.compare(password, user.password);
+
+//         if (!passwordMatch) {
+//             return res.status(401).json({ message: 'Username atau password salah' });
+//         }
+
+//         const expiresIn = process.env.JWT_EXPIRES_IN || "1h"; 
+//         const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn });
+
+//         addActiveToken(token); // Simpan token ke daftar aktif
+//         // res.cookie('token', token, { httpOnly: true, secure: true });
+//         res.json({ message: 'Login berhasil', token, role: user.role });
+//     } catch (error) {
+//         console.error("Login Error:", error);
+//         res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+//     }
+// };
+
+// const loginUser = async (req, res) => {
+//     const { username, password } = req.body;
+  
+//     if (!username || !password) {
+//       return res.status(400).json({ message: 'Username dan password wajib diisi' });
+//     }
+  
+//     try {
+//       const user = await User.findOne({ where: { username } });
+  
+//       if (!user) {
+//         return res.status(401).json({ message: 'Username atau password salah' });
+//       }
+  
+//       const passwordMatch = await bcrypt.compare(password, user.password);
+  
+//       if (!passwordMatch) {
+//         return res.status(401).json({ message: 'Username atau password salah' });
+//       }
+  
+//       const expiresIn = process.env.JWT_EXPIRES_IN || "1h";
+//       const token = jwt.sign(
+//         { id: user.id, username: user.username, role: user.role },
+//         process.env.JWT_SECRET,
+//         { expiresIn }
+//       );
+  
+//       // Kirim token sebagai cookie HTTP-only
+//       res.cookie('token', token, {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // aktif hanya di HTTPS
+//         sameSite: 'Strict',
+//         maxAge: 3600000 // 1 jam
+//       });
+  
+//       res.json({ message: 'Login berhasil', role: user.role });
+//     } catch (error) {
+//       console.error("Login Error:", error);
+//       res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+//     }
+//   };
+
 const loginUser = async (req, res) => {
     const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username dan password wajib diisi' });
-    }
-
+    if (!username || !password) return res.status(400).json({ message: 'Username dan password wajib diisi' });
+  
     try {
-        const user = await User.findOne({ where: { username } });
+      const user = await User.findOne({ where: { username } });
+      if (!user) return res.status(401).json({ message: 'Username atau password salah' });
+  
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return res.status(401).json({ message: 'Username atau password salah' });
+  
+      const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: false, // aktifkan jika pakai HTTPS
+        sameSite: 'Strict',
+        maxAge: 3600000, // 1 jam
+      });
 
-        if (!user) {
-            return res.status(401).json({ message: 'Username atau password salah' });
-        }
+      addActiveToken(token);
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ message: 'Username atau password salah' });
-        }
-
-        const expiresIn = process.env.JWT_EXPIRES_IN || "1h"; 
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn });
-
-        addActiveToken(token); // Simpan token ke daftar aktif
-        // res.cookie('token', token, { httpOnly: true, secure: true });
-        res.json({ message: 'Login berhasil', token, role: user.role });
-    } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+  
+      res.json({ message: 'Login berhasil', token, role: user.role });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error' });
     }
-};
+  };
 
 // Logout User
-const logoutUser = async (req, res) => {
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-
-    // Hapus token dari daftar aktif
-    removeActiveToken(token); 
+const logoutUser = (req, res) => {
     res.clearCookie('token');
     res.json({ message: 'Logout berhasil' });
-};
+  };
+  
 
 // Verifikasi User
 // const verifyUser = async (req, res) => {
@@ -126,4 +194,8 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getAllUsers, deleteUser, logoutUser, verifyUser };
+const checkStatus = (req, res) => {
+    res.json({ loggedIn: true, user: req.user });
+  };
+
+module.exports = { registerUser, loginUser, getAllUsers, deleteUser, logoutUser, verifyUser, checkStatus };

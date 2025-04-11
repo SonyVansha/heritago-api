@@ -8,25 +8,27 @@ const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
+const locationRoutes = require("./routes/locationRoutes");
 
 // Middleware to parse cookies
 const cookieParser = require("cookie-parser");
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Serve static files from the "public" directory
 app.use("/certificates", express.static(path.join(__dirname, "public", "certificates")));
-app.use(cors({ origin: '*', credentials: true }));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 // Define routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", tourRoutes);
 app.use("/api", certificateRoutes);
+app.use("/api/locations", locationRoutes);
 
 // app routes for testing server side
 app.use("/", (req, res) => {
