@@ -10,6 +10,7 @@ async function testConnection() {
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully to database squelize.');
+    // await sequelize.sync({ force: true }); // Sync the models with the database
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }

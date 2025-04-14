@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const tourRoutes = require("./routes/tourRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
 const locationRoutes = require("./routes/locationRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 
 // Middleware to parse cookies
 const cookieParser = require("cookie-parser");
@@ -29,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", tourRoutes);
 app.use("/api", certificateRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api", quizRoutes);
 
 // app routes for testing server side
 app.use("/", (req, res) => {
