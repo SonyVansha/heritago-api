@@ -99,6 +99,9 @@
 
 const Quiz = require('../models/quiz');
 const Question = require('../models/question');
+const path = require('path');
+const fs = require('fs/promises');
+const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 
 // Mendapatkan semua quiz hanya dengan id dan title
 const getAllQuizzes = async (req, res) => {
@@ -161,9 +164,60 @@ const getQuizByPostId = async (req, res) => {
   }
 };
 
+const generateCertificateWithBackgroundBackend = async (req, res, name, course) => {
+  if (!name || !course) {
+    return res.status(400).json({ error: 'Nama dan kursus diperlukan.' });
+  }
+
+  try {
+    const backgroundImagePath = path.join(__dirname, '..', 'public', 'img', 'template.png');
+    await fs.access(backgroundImagePath); // Cek apakah file ada
+
+    const backgroundImageBytes = await fs.readFile(backgroundImagePath);
+    const pdfDoc = await PDFDocument.create();
+    const backgroundPng = await pdfDoc.embedPng(backgroundImageBytes);
+    const page = pdfDoc.addPage([backgroundPng.width, backgroundPng.height]);
+
+    page.drawImage(backgroundPng, {
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: page.getHeight(),
+    });
+
+    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const italicFont = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+    const textColor = rgb(0, 0, 0);
+
+    page.drawText(name, {
+      x: 350,
+      y: 400,
+      font,
+      size: 70,
+      color: textColor,
+    });
+
+    page.drawText(course, {
+      x: 350,
+      y: 350,
+      font: italicFont,
+      size: 30,
+      color: textColor,
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="sertifikat_${name.replace(/\s/g, '_')}.pdf"`);
+    res.send(Buffer.from(pdfBytes));
+  } catch (error) {
+    console.error('Gagal membuat sertifikat:', error);
+    res.status(500).json({ error: 'Gagal membuat sertifikat.' });
+  }
+};
+
 // Menyimpan hasil jawaban kuis
 const submitQuiz = async (req, res) => {
-  const { quizId, answers } = req.body;
+  const { quizId, answers, name } = req.body;
 
   try {
     // Ambil quiz berdasarkan quizId
@@ -210,12 +264,34 @@ const submitQuiz = async (req, res) => {
       results
     };
 
-    res.json(response);
-
+    // Jika pengguna memenuhi syarat untuk mendapatkan sertifikat, buat sertifikat
+    if (scorePercentage >= 90) {
+      const courseName = quiz.title;
+      const downloadUrl = `/api/posts/certificate?name=${encodeURIComponent(name)}&course=${encodeURIComponent(courseName)}`;
+    
+          // Jika pengguna memenuhi syarat untuk mendapatkan sertifikat, buat sertifikat
+    // if (scorePercentage >= 90) {
+    //   const courseName = quiz.title;
+    //   return generateCertificateWithBackgroundBackend(req, res, name, courseName);
+    // }
+      return res.json({
+        certificateEligible: true,
+        score: scorePercentage,
+        totalQuestions: questions.length,
+        results,
+        certificateDownloadUrl: downloadUrl
+      });
+      // res.json(response);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Gagal memproses kuis' });
   }
 };
 
-module.exports = { getQuizByPostId, submitQuiz, getAllQuizzes };
+const getCertificate = async (req, res) => {
+  const { name, course } = req.query;
+  return generateCertificateWithBackgroundBackend(req, res, name, course);
+};
+
+module.exports = { getQuizByPostId, submitQuiz, getAllQuizzes, getCertificate };
