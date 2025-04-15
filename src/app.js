@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors");
+const cors = require("cors")({ origin: true });
 const bodyParser = require('body-parser');
 const path = require("path");
 
@@ -19,10 +19,11 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" directory
 app.use("/certificates", express.static(path.join(__dirname, "public", "certificates")));
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors);
 
 // Define routes
 app.use("/api/users", userRoutes);

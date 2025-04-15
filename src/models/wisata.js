@@ -34,7 +34,7 @@ const Wisata = sequelize.define('wisata', {
   timestamps: true, // Set to true if your table has createdAt and updatedAt columns
 });
 
-// console.log("Wisata model:", Wisata);
+// console.log("Wisata model:", Wisata);s
 
 // Sinkronisasi database agar tabel dibuat secara otomatis jika belum ada
 async function syncDatabase() {

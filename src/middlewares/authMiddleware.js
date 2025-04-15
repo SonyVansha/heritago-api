@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 // const verifyToken = (req, res, next) => {
-//     const authHeader = req.headers.authorization;
+//     const authHesader = req.headers.authorization;
   
 //     if (!authHeader || !authHeader.startsWith('Bearer ')) {
 //       return res.status(401).json({ message: 'Token tidak tersedia' });
